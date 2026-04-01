@@ -1,6 +1,6 @@
 import pytest
 
-from src.controllers.MeController import MeController
+from src.controllers.me import MeController
 from src.utils.parse_protected_event import parse_protected_event
 from src.exceptions.AccessTokenNotProvided import AccessTokenNotProvided
 from src.exceptions.InvalidAccessToken import InvalidAccessToken

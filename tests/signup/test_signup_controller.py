@@ -1,6 +1,6 @@
 import pytest
 from pydantic import ValidationError
-from src.controllers.SignupController import SignupController
+from src.controllers.signup import SignupController
 
 
 @pytest.mark.asyncio

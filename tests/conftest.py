@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, Asyn
 
 from src.db.models.base import Base
 from src.db.models.users import User
-from src.controllers.SigninController import SigninController
+from src.controllers.signin import SigninController
 
 
 @pytest.fixture

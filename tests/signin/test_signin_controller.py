@@ -1,6 +1,6 @@
 import pytest
 from pydantic import ValidationError
-from src.controllers.SigninController import SigninController
+from src.controllers.signin import SigninController
 from src.utils.http import bad_request
 
 
