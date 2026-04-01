@@ -6,7 +6,10 @@ from ..utils.http import unauthorized
 from ..app_types.http import HTTPResponse
 from ..exceptions.AccessTokenNotProvided import AccessTokenNotProvided
 from ..exceptions.InvalidAccessToken import InvalidAccessToken
-from ..controllers.CreateMealController import CreateMealController
+from ..controllers.create_meal import CreateMealController
+
+from src.services.storage import StorageService
+from src.repository.meal_repository import MealRepository
 
 
 async def async_handler(event: Dict[str, Any], context: Any) -> HTTPResponse:
@@ -14,7 +17,10 @@ async def async_handler(event: Dict[str, Any], context: Any) -> HTTPResponse:
     
     try:
         request = parse_protected_event(event=event)
-        controller = CreateMealController()
+        controller = CreateMealController(
+            meal_repository=MealRepository(),
+            storage_service=StorageService(),
+        )
         response = await controller.handle(request=request)
     except AccessTokenNotProvided:
         response = unauthorized(body={"error": "Access token not provided."})
