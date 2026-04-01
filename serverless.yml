@@ -1,5 +1,5 @@
 org: jonvibes
-service: server-api
+service: api-v1
   
 provider:
   name: aws
@@ -12,7 +12,16 @@ provider:
     SECRET_JWT_PUBLIC_KEY: ${env:SECRET_JWT_PUBLIC_KEY}
     BUCKET_NAME: !Ref UploadsBucket
     MEALS_QUEUE_URL: !Ref MealsQueue
-
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - s3:PutObject
+          Resource: !Sub "${UploadsBucket.Arn}/*"
+        - Effect: Allow
+          Action: sqs:SendMessage
+          Resource: !GetAtt MealsQueue.Arn
   # ecr:
   #   images:
   #     app-image:
@@ -90,13 +99,26 @@ functions:
           method: GET
   
   fileUploadEvent:
-    handler: src/functions/file_upload_event.handler
+    image:
+      uri: 553004107808.dkr.ecr.us-east-1.amazonaws.com/lambda-container:latest
+      command:
+        - src.functions.file_upload_event.handler
     events:
       - s3:
           bucket: !Ref UploadsBucket
           event: s3:ObjectCreated:*
           existing: true
           forceDeploy: true
+  
+  processMeal:
+    image:
+      uri: 553004107808.dkr.ecr.us-east-1.amazonaws.com/lambda-container:latest
+      command:
+        - src.functions.process_meal.handler
+    events:
+      - sqs:
+          arn: !GetAtt MealsQueue.Arn
+          batchSize: 1
             
 resources:
   Resources:
