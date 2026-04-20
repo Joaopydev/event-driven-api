@@ -49,7 +49,7 @@ class CreateMealController:
         )
 
         meal = await self.meal_repository.create_meal(
-            user_id=request["user_id"],
+            user_id=int(request["user_id"]),
             input_file_key=file_key,
             file_type=data.file_type.value,
         )
