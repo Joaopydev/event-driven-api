@@ -25,4 +25,19 @@ class StorageService:
             )
             return presigned_url
         except ClientError as e:
-            raise RuntimeError(f"Error generating presigned URL: {e}")
+            raise RuntimeError(f"Error generating presigned URL: {e}") from e
+    
+    @classmethod
+    def get_object_from_bucket(cls, key: str):
+        try:
+            return s3_client.get_object(
+                Bucket=os.getenv("BUCKET_NAME"),
+                Key=key
+            )
+        except ClientError as e:
+            raise RuntimeError("Failed to fetch object in s3") from e
+        
+    @classmethod
+    def read_object_content(cls, key: str):
+        obj = cls.get_object_from_bucket(key)
+        return obj["Body"].read()
