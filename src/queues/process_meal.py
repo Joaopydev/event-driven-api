@@ -22,8 +22,8 @@ class ProcessMeal:
             return
         
         await self.meal_repository.update_meal_status(
-            meal=meal,
-            status=MealStatus.processing
+            meal_id=meal.id,
+            new_status=MealStatus.processing
         )
 
         # TODO: Implement the logic to process the meal through the AI
@@ -37,8 +37,8 @@ class ProcessMeal:
                 print(transcription)
                 
             await self.meal_repository.update_meal_data(
-                meal=meal,
-                status=MealStatus.success,
+                meal_id=meal.id,
+                new_status=MealStatus.success,
                 name="Café da manhã",
                 icon="",
                 foods=[

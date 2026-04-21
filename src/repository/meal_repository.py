@@ -1,6 +1,6 @@
 from datetime import date, datetime
 from typing import List, Dict
-from sqlalchemy import select
+from sqlalchemy import select, update
 
 from ..db.connection import get_db
 from ..db.models.meals import InputType, MealStatus, Meal
@@ -68,26 +68,34 @@ class MealRepository:
         
 
     @classmethod
-    async def update_meal_status(cls, meal: Meal, status: MealStatus) -> None:
+    async def update_meal_status(cls, meal_id: str, new_status: MealStatus) -> None:
         async with get_db() as db:
-            meal.status = status
+            await db.execute(
+                update(Meal)
+                .where(Meal.id == meal_id)
+                .values(status=new_status)
+            )
             await db.commit()
-            await db.refresh(meal)
 
     
     @classmethod
     async def update_meal_data(
         cls,
-        meal: Meal,
-        status: MealStatus,
+        meal_id: str,
+        new_status: MealStatus,
         name: str,
         icon: str,
         foods: List[Dict[str, any]]
     ):
         async with get_db() as db:
-            meal.status = status
-            meal.name = name
-            meal.icon = icon
-            meal.foods = foods
+            await db.execute(
+                update(Meal)
+                .where(Meal.id == meal_id)
+                .values(
+                    status=new_status,
+                    name=name,
+                    icon=icon,
+                    foods=foods,
+                )
+            )
             await db.commit()
-            await db.refresh(meal)
