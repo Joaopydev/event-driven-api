@@ -10,6 +10,7 @@ provider:
     DATA_BASE_URL: ${env:DATA_BASE_URL}
     SECRET_JWT_PRIVATE_KEY: ${env:SECRET_JWT_PRIVATE_KEY}
     SECRET_JWT_PUBLIC_KEY: ${env:SECRET_JWT_PUBLIC_KEY}
+    OPENAI_API_KEY: ${env:OPENAI_API_KEY}
     BUCKET_NAME: !Ref UploadsBucket
     MEALS_QUEUE_URL: !Ref MealsQueue
   iam:

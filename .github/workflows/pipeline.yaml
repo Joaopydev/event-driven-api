@@ -99,3 +99,4 @@ jobs:
           SECRET_JWT_PRIVATE_KEY: ${{ secrets.SECRET_JWT_PRIVATE_KEY }}
           SECRET_JWT_PUBLIC_KEY: ${{ secrets.SECRET_JWT_PUBLIC_KEY }}
           ECR_IMAGE_URI: ${{ secrets.ECR_IMAGE_URI }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
