@@ -54,6 +54,6 @@ class ProcessMeal:
             )
         except Exception:
             await self.meal_repository.update_meal_status(
-                meal=meal,
-                status=MealStatus.failed
+                meal_id=meal.id,
+                new_status=MealStatus.failed
             )

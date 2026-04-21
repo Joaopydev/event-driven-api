@@ -1,3 +1,4 @@
+import logging
 import io
 from openai import OpenAI
 
@@ -18,4 +19,5 @@ class AIClient:
             )
             return transcript.text
         except Exception as e:
-            raise RuntimeError(f"Audio transcription failed: {e}")
+            logging.error(f"Audio transcription failed: {e}")
+            raise RuntimeError()

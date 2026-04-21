@@ -1,4 +1,5 @@
 import os
+import logging
 from dotenv import load_dotenv
 
 from botocore.exceptions import ClientError
@@ -25,7 +26,8 @@ class StorageService:
             )
             return presigned_url
         except ClientError as e:
-            raise RuntimeError(f"Error generating presigned URL: {e}") from e
+            logging.error(f"Error generating presigned URL: {e}")
+            raise RuntimeError() from e
     
     @classmethod
     def get_object_from_bucket(cls, key: str):
@@ -35,7 +37,8 @@ class StorageService:
                 Key=key
             )
         except ClientError as e:
-            raise RuntimeError("Failed to fetch object in s3") from e
+            logging.error(f"Failed to fetch object in s3: {e}")
+            raise RuntimeError() from e
         
     @classmethod
     def read_object_content(cls, key: str):
