@@ -19,5 +19,4 @@ class AIClient:
             )
             return transcript.text
         except Exception as e:
-            logging.error(f"Audio transcription failed: {e}")
-            raise RuntimeError()
+            raise RuntimeError(f"Audio transcription failed: {e}")
