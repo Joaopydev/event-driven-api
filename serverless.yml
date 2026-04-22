@@ -130,7 +130,7 @@ resources:
         QueueName: meals-queue-service
         VisibilityTimeout: 60
         RedrivePolicy:
-          maxReceiveCount: 1
+          maxReceiveCount: 2
           deadLetterTargetArn: !GetAtt MealsDLQ.Arn
 
     MealsDLQ:
