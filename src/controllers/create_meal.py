@@ -44,6 +44,7 @@ class CreateMealController:
         file_key = f"{file_id}{ext}"
         
         presigned_url = self.storage_service.get_presigned_url(
+            method_type="put_object",
             file_key=file_key,
             content_type=data.file_type.value
         )

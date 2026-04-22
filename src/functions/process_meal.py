@@ -7,7 +7,7 @@ from ..services.ai import AIClient
 from ..services.storage import StorageService
 
 
-async def async_handler(event):
+async def async_handler(event) -> None:
     process_meal = ProcessMeal(
         meal_repository=MealRepository(),
         storage_service=StorageService(),
@@ -20,5 +20,5 @@ async def async_handler(event):
     await asyncio.gather(*tasks)
 
 
-def handler(event, _):
+def handler(event, _) -> None:
     asyncio.run(async_handler(event=event))

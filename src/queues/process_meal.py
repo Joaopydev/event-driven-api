@@ -30,13 +30,29 @@ class ProcessMeal:
 
         # TODO: Implement the logic to process the meal through the AI
         try:
+            meal_details = ""
             if meal.input_type.value == "audio":
                 audio_data = self.storage_service.read_object_content(key=meal.input_file_key)
-                transcription = self.ai_client.transcribe_audio(
+                transcription = await self.ai_client.transcribe_audio(
                     audio_data=audio_data,
                     key=file_key
                 )
-                print(transcription)
+                meal_details = await self.ai_client.get_meal_details_from_text(
+                    input=transcription,
+                    created_at=meal.created_at
+                )
+            elif meal.input_type.value == "picture":
+                image_url = self.storage_service.get_presigned_url(
+                    method_type="get_object",
+                    file_key=file_key,
+                    content_type="image/jpeg",
+                )
+                meal_details = await self.ai_client.get_meal_details_from_image(
+                    image_url=image_url,
+                    created_at=meal.created_at,
+                )
+
+            print(meal_details)
                 
             await self.meal_repository.update_meal_data(
                 meal_id=meal.id,
