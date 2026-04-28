@@ -76,7 +76,7 @@ class AIClient:
         """
         try:
             response = await client.chat.completions.create(
-                model="gtp-4.1-mini",
+                model="gpt-4.1-mini",
                 messages=[
                     {
                         "role": "system",
