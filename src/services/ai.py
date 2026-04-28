@@ -3,7 +3,6 @@ from datetime import datetime
 
 from openai import AsyncOpenAI
 
-
 client = AsyncOpenAI()
 
 class AIClient:

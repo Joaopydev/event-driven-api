@@ -72,6 +72,7 @@ class ProcessMeal:
                 meal_id=meal.id,
                 new_status=MealStatus.failed
             )
-        except TimeoutError:
+        except TimeoutError as e:
             """Retry if lambda throws timeout error"""
+            logging.error(f"Timeout error occurred while processing meal: {e}")
             raise
