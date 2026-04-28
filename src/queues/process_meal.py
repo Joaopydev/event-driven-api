@@ -1,3 +1,4 @@
+import json
 import logging
 
 from ..db.models.meals import MealStatus
@@ -43,28 +44,17 @@ class ProcessMeal:
                 )
             elif meal.input_type.value == "picture":
                 image_url = self.storage_service.get_download_url(file_key)
-                print(image_url)
                 meal_details = await self.ai_client.get_meal_details_from_image(
                     image_url=image_url,
                     created_at=meal.created_at,
                 )
-            print(meal_details)
-                
+            parse_meal_details = json.loads(meal_details)
             await self.meal_repository.update_meal_data(
                 meal_id=meal.id,
                 new_status=MealStatus.success,
-                name="Café da manhã",
-                icon="",
-                foods=[
-                    {
-                        "name": "Pão",
-                        "quantity": "2 fatias",
-                        "calories": 100,
-                        "proteins": 200,
-                        "carbohydrates": 400,
-                        "fats": 400,
-                    }
-                ]
+                name=parse_meal_details.get("name", ""),
+                icon=parse_meal_details.get("icon", ""),
+                foods=parse_meal_details.get("foods", []),
             )
         except TimeoutError as e:
             """Retry if lambda throws timeout error"""
