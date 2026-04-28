@@ -32,7 +32,7 @@ class ProcessMeal:
         try:
             meal_details = ""
             if meal.input_type.value == "audio":
-                audio_data = self.storage_service.read_object_content(key=meal.input_file_key)
+                audio_data = await self.storage_service.read_object_content(key=meal.input_file_key)
                 transcription = await self.ai_client.transcribe_audio(
                     audio_data=audio_data,
                     key=file_key
@@ -42,12 +42,12 @@ class ProcessMeal:
                     created_at=meal.created_at
                 )
             elif meal.input_type.value == "picture":
-                image_url = self.storage_service.get_download_url(file_key)
+                image_url = await self.storage_service.get_download_url(file_key)
+                print(image_url)
                 meal_details = await self.ai_client.get_meal_details_from_image(
                     image_url=image_url,
                     created_at=meal.created_at,
                 )
-
             print(meal_details)
                 
             await self.meal_repository.update_meal_data(
@@ -66,13 +66,13 @@ class ProcessMeal:
                     }
                 ]
             )
+        except TimeoutError as e:
+            """Retry if lambda throws timeout error"""
+            logging.error(f"Timeout error occurred while processing meal: {e}")
+            raise
         except Exception as e:
             logging.error(f"Failed to process meal: {e}")
             await self.meal_repository.update_meal_status(
                 meal_id=meal.id,
                 new_status=MealStatus.failed
             )
-        except TimeoutError as e:
-            """Retry if lambda throws timeout error"""
-            logging.error(f"Timeout error occurred while processing meal: {e}")
-            raise

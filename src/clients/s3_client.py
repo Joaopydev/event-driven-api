@@ -1,3 +1,5 @@
-import boto3
+import aioboto3
 
-s3_client = boto3.client("s3")
+def get_s3_client():
+    session = aioboto3.Session()
+    return session.client("s3")

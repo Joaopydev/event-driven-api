@@ -116,6 +116,7 @@ functions:
       - sqs:
           arn: !GetAtt MealsQueue.Arn
           batchSize: 1
+    timeout: 30
             
 resources:
   Resources:
