@@ -2,6 +2,8 @@ import pytest
 from unittest.mock import Mock, AsyncMock
 
 from src.controllers.signin import SigninController
+from src.services.hashed_service import HashedPasswordService
+from src.repository.user_repository import UserRepository
 
 
 @pytest.mark.asyncio
@@ -41,31 +43,20 @@ async def test_signin_controller_invalid_credentials():
 
 
 @pytest.mark.asyncio
-async def test_signin_controller_ok():
+async def test_signin_controller_ok(test_session_db, test_user):
     request_body = {
         "email": "test@gmail.com",
         "password": "password",
     }
 
-    user_repository_mock = AsyncMock()
-    user_repository_mock.get_user_by_email.return_value = Mock(
-        email="test@gmail.com",
-        password="password"
-    )
-    hashed_service_mock = Mock()
-    hashed_service_mock.verify_password.return_value = True
+    user_repository = UserRepository(db_session=lambda: test_session_db)
+    hashed_service = HashedPasswordService()
 
     controller = SigninController(
-        user_repository=user_repository_mock,
-        hashed_service=hashed_service_mock
+        user_repository=user_repository,
+        hashed_service=hashed_service
     )
-
     result = await controller.handle(body=request_body)
 
-    user_repository_mock.get_user_by_email.assert_called_once_with(email="test@gmail.com")
-    hashed_service_mock.verify_password.assert_called_once_with(
-        password="password",
-        hashed_password="password"
-    )
     assert result["statusCode"] == 200
     assert "access_token" in result["body"]

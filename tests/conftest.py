@@ -1,12 +1,10 @@
 import pytest
-import bcrypt
 
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 
 from src.db.models.base import Base
-from src.db.models.users import User
-from src.controllers.signin import SigninController
-
+from src.services.hashed_service import HashedPasswordService
+from src.repository.user_repository import UserRepository
 
 @pytest.fixture
 async def test_engine():
@@ -36,33 +34,11 @@ async def test_session_db(test_engine):
 
 @pytest.fixture
 async def test_user(test_session_db):
-    password_hash = bcrypt.hashpw(
-        password="password".encode("utf-8"),
-        salt=bcrypt.gensalt(8),
-    )
-
-    user = User(
+    password_hash = HashedPasswordService.hash_password("password")
+    user_repository = UserRepository(db_session=lambda: test_session_db)
+    user = await user_repository.insert_user(
         name="Teste",
-        email="joao@gmail.com",
+        email="test@gmail.com",
         password=password_hash,
     )
-
-    test_session_db.add(user)
-    await test_session_db.commit()
-    await test_session_db.refresh(user)
-
     return user
-
-
-@pytest.fixture
-async def test_login_user(test_session_db, test_user):
-    request_body = {
-        "email": "joao@gmail.com",
-        "password": "password",
-    }
-
-    controller = SigninController(session=lambda: test_session_db)
-
-    result = await controller.handle(body=request_body)
-
-    return result["body"].get("access_token", "")

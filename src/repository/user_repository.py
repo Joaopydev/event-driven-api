@@ -6,23 +6,23 @@ from ..db.models.users import User
 
 class UserRepository:
 
-    @classmethod
-    async def insert_user(cls, name: str, email: str, password: str) -> User:
-        async with get_db() as db:
+    def __init__(self, db_session=None):
+        self.db_session = db_session or get_db
+
+    async def insert_user(self, name: str, email: str, password: str) -> User:
+        async with self.db_session() as db:
             user = User(name=name, email=email, password=password)
             db.add(user)
             await db.commit()
             await db.refresh(user)
             return user
 
-    @classmethod
-    async def get_user_by_id(cls, user_id: int) -> User | None:
-        async with get_db() as db:
+    async def get_user_by_id(self, user_id: int) -> User | None:
+        async with self.db_session() as db:
             return await db.get(User, user_id)
-        
-    @classmethod
-    async def get_user_by_email(cls, email: str) -> User | None:
-        async with get_db() as db:
+
+    async def get_user_by_email(self, email: str) -> User | None:
+        async with self.db_session() as db:
             query = select(User).where(User.email == email)
             result = await db.execute(query)
             user = result.scalars().first()
