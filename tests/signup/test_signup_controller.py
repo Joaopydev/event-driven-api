@@ -1,6 +1,8 @@
 import pytest
-from pydantic import ValidationError
+
 from src.controllers.signup import SignupController
+from src.repository.user_repository import UserRepository
+from src.services.hashed_service import HashedPasswordService
 
 
 @pytest.mark.asyncio
@@ -11,13 +13,15 @@ async def test_signup_controller_invalid_data_entry(test_session_db):
         "password": 000000,
     }
 
-    controller = SignupController(session=lambda: test_session_db)
+    controller = SignupController(
+        user_repository=UserRepository(db_session=lambda: test_session_db),
+        hashed_service=HashedPasswordService()
+    )
 
-    with pytest.raises(ValidationError) as exc_info:
-        await controller._validate_body(body=request_body)
-
-    assert isinstance(exc_info.value, ValidationError)
-
+    response = await controller.handle(body=request_body)
+    assert response["statusCode"] == 400
+    assert response["body"]["errors"][0]["type"] == "string_type"
+    assert response["body"]["errors"][1]["type"] == "value_error"
 
 @pytest.mark.asyncio
 async def test_signup_controller_created(test_session_db):
@@ -27,23 +31,29 @@ async def test_signup_controller_created(test_session_db):
         "password": "password",
     }
 
-    controller = SignupController(session=lambda: test_session_db)
-    result = await controller.handle(body=request_body)
+    controller = SignupController(
+        user_repository=UserRepository(db_session=lambda: test_session_db),
+        hashed_service=HashedPasswordService()
+    )
+    response = await controller.handle(body=request_body)
 
-    assert result.get("statusCode", 400) == 201
-    assert "access_token" in result.get("body", {})
+    assert response.get("statusCode", 400) == 201
+    assert "access_token" in response.get("body", {})
 
 
 @pytest.mark.asyncio
 async def test_signup_controller_conflict(test_session_db, test_user):
     request_body = {
         "name": "Test",
-        "email": "joao@gmail.com",
+        "email": "test@gmail.com",
         "password": "password"
     }
 
-    controller = SignupController(session=lambda: test_session_db)
-    result = await controller.handle(body=request_body)
+    controller = SignupController(
+        user_repository=UserRepository(db_session=lambda: test_session_db),
+        hashed_service=HashedPasswordService()
+    )
+    response = await controller.handle(body=request_body)
 
-    assert result.get("statusCode", 200) == 409
-    assert result["body"].get("error", "") == "Email already exists"
+    assert response.get("statusCode", 200) == 409
+    assert response["body"].get("error", "") == "Email already exists"

@@ -50,7 +50,6 @@ jobs:
             --push .
 
   test:
-    if: false
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -71,7 +70,7 @@ jobs:
         run: pytest
     
   deploy:
-    needs: build
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code

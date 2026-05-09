@@ -1,5 +1,6 @@
 import pytest
 
+from src.repository.user_repository import UserRepository
 from src.controllers.me import MeController
 from src.utils.parse_protected_event import parse_protected_event
 from src.exceptions.AccessTokenNotProvided import AccessTokenNotProvided
@@ -46,7 +47,7 @@ async def test_me_controller(test_login_user, test_session_db):
 
     request = parse_protected_event(event=event)
 
-    controller = MeController(session=lambda: test_session_db)
+    controller = MeController(UserRepository(db_session=lambda: test_session_db))
     response = await controller.handle(data=request)
 
     assert response["statusCode"] == 200

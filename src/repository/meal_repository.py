@@ -8,15 +8,17 @@ from ..db.models.meals import InputType, MealStatus, Meal
 
 class MealRepository:
 
-    @classmethod
+    def __init__(self, db_session=None):
+        self.db_session = db_session or get_db
+
     async def create_meal(
-        cls,
+        self,
         user_id: int,
         input_file_key: str,
         file_type: str
     ) -> Meal:
         
-        async with get_db() as db:
+        async with self.db_session() as db:
             meal = Meal(
                 user_id=user_id,
                 status=MealStatus.uploading,
@@ -35,8 +37,8 @@ class MealRepository:
         
     
     @classmethod
-    async def get_meal_by_id(cls, meal_id: str, user_id: int) -> Meal | None:
-        async with get_db() as db:
+    async def get_meal_by_id(self, meal_id: str, user_id: int) -> Meal | None:
+        async with self.db_session() as db:
             query = select(Meal).where(
                 Meal.id == meal_id,
                 Meal.user_id == user_id
@@ -46,16 +48,16 @@ class MealRepository:
         
     
     @classmethod
-    async def get_meal_by_file_key(cls, file_key: str) -> Meal | None:
-        async with get_db() as db:
+    async def get_meal_by_file_key(self, file_key: str) -> Meal | None:
+        async with self.db_session() as db:
             query = select(Meal).where(Meal.input_file_key == file_key)
             result = await db.execute(query)
             return result.scalars().first()
         
     
     @classmethod
-    async def list_meals_by_date(cls, user_id: int, start_date: date, end_date: datetime) -> List[Meal]:
-        async with get_db() as db:
+    async def list_meals_by_date(self, user_id: int, start_date: date, end_date: datetime) -> List[Meal]:
+        async with self.db_session() as db:
             query = select(Meal).where(
                 Meal.user_id == user_id,
                 Meal.status == MealStatus.success,
@@ -68,8 +70,8 @@ class MealRepository:
         
 
     @classmethod
-    async def update_meal_status(cls, meal_id: str, new_status: MealStatus) -> None:
-        async with get_db() as db:
+    async def update_meal_status(self, meal_id: str, new_status: MealStatus) -> None:
+        async with self.db_session() as db:
             await db.execute(
                 update(Meal)
                 .where(Meal.id == meal_id)
@@ -80,14 +82,14 @@ class MealRepository:
     
     @classmethod
     async def update_meal_data(
-        cls,
+        self,
         meal_id: str,
         new_status: MealStatus,
         name: str,
         icon: str,
         foods: List[Dict[str, any]]
     ):
-        async with get_db() as db:
+        async with self.db_session() as db:
             await db.execute(
                 update(Meal)
                 .where(Meal.id == meal_id)

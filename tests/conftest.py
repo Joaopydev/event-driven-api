@@ -5,6 +5,8 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, Asyn
 from src.db.models.base import Base
 from src.services.hashed_service import HashedPasswordService
 from src.repository.user_repository import UserRepository
+from src.controllers.signin import SigninController
+
 
 @pytest.fixture
 async def test_engine():
@@ -42,3 +44,18 @@ async def test_user(test_session_db):
         password=password_hash,
     )
     return user
+
+@pytest.fixture
+async def test_login_user(test_session_db, test_user):
+    controller = SigninController(
+        user_repository=UserRepository(db_session=lambda: test_session_db),
+        hashed_service=HashedPasswordService()
+    )
+    response = await controller.handle(
+        body={
+            "email": "test@gmail.com",
+            "password": "password"
+        }
+    )
+
+    return response["body"]["access_token"]
