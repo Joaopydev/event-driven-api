@@ -6,8 +6,8 @@ from ..db.models.users import User
 
 class UserRepository:
 
-    def __init__(self, db_session=None):
-        self.db_session = db_session or get_db
+    def __init__(self, db_session):
+        self.db_session = db_session
 
     async def insert_user(self, name: str, email: str, password: str) -> User:
         async with self.db_session() as db:

@@ -8,12 +8,13 @@ from ..utils.parse_response import parse_response
 
 from ..repository.user_repository import UserRepository
 from ..services.hashed_service import HashedPasswordService
+from ..db.connection import get_db
 
 
 async def async_handler(event: Dict[str, Any], context: Any) -> HTTPResponse:
     request = parse_event(event=event)
     controller = SignupController(
-        user_repository=UserRepository(),
+        user_repository=UserRepository(db_session=get_db),
         hashed_service=HashedPasswordService()
     )
     response = await controller.handle(body=request.get("body", {}))

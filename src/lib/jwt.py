@@ -23,7 +23,7 @@ def load_pem_key(key_env_var: str) -> bytes:
 def signin_access_token(user_id: str):
     now = datetime.now(timezone.utc)
     payload = {
-        "user_id": str(user_id),
+        "user_id": int(user_id),
         "iss": os.getenv("ISSUER"),
         "iat": int(now.timestamp()),
         "exp": now + timedelta(days=3)

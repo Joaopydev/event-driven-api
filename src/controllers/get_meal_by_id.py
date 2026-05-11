@@ -25,7 +25,7 @@ class GetMealByIdController:
         except ValidationError as ex:
             return bad_request(body={"errors": ex.errors()})
         
-        meal = await self.meal_repository.get_meal_by_id(meal_id=data.meal_id, user_id=request["user_id"])
+        meal = await self.meal_repository.get_meal_by_id(meal_id=str(data.meal_id), user_id=request["user_id"])
         if not meal:
             raise RuntimeError("Meal not found.") #TODO create exception for this case and handle it properly 
         

@@ -5,11 +5,12 @@ from ..queues.process_meal import ProcessMeal
 from ..repository.meal_repository import MealRepository
 from ..services.ai import AIClient
 from ..services.storage import StorageService
+from ..db.connection import get_db
 
 
 async def async_handler(event) -> None:
     process_meal = ProcessMeal(
-        meal_repository=MealRepository(),
+        meal_repository=MealRepository(db_session=get_db),
         storage_service=StorageService(),
         ai_client=AIClient()
     )

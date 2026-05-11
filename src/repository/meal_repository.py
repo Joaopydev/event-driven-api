@@ -2,14 +2,13 @@ from datetime import date, datetime
 from typing import List, Dict
 from sqlalchemy import select, update
 
-from ..db.connection import get_db
 from ..db.models.meals import InputType, MealStatus, Meal
 
 
 class MealRepository:
 
-    def __init__(self, db_session=None):
-        self.db_session = db_session or get_db
+    def __init__(self, db_session):
+        self.db_session = db_session
 
     async def create_meal(
         self,
@@ -36,7 +35,6 @@ class MealRepository:
             return meal
         
     
-    @classmethod
     async def get_meal_by_id(self, meal_id: str, user_id: int) -> Meal | None:
         async with self.db_session() as db:
             query = select(Meal).where(
@@ -46,16 +44,12 @@ class MealRepository:
             result = await db.execute(query)
             return result.scalars().first()
         
-    
-    @classmethod
     async def get_meal_by_file_key(self, file_key: str) -> Meal | None:
         async with self.db_session() as db:
             query = select(Meal).where(Meal.input_file_key == file_key)
             result = await db.execute(query)
             return result.scalars().first()
         
-    
-    @classmethod
     async def list_meals_by_date(self, user_id: int, start_date: date, end_date: datetime) -> List[Meal]:
         async with self.db_session() as db:
             query = select(Meal).where(
@@ -68,8 +62,6 @@ class MealRepository:
             meals = result.scalars().all()
             return meals
         
-
-    @classmethod
     async def update_meal_status(self, meal_id: str, new_status: MealStatus) -> None:
         async with self.db_session() as db:
             await db.execute(
@@ -79,8 +71,6 @@ class MealRepository:
             )
             await db.commit()
 
-    
-    @classmethod
     async def update_meal_data(
         self,
         meal_id: str,

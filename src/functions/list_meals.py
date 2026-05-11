@@ -8,7 +8,9 @@ from ..exceptions.AccessTokenNotProvided import AccessTokenNotProvided
 from ..exceptions.InvalidAccessToken import InvalidAccessToken
 from ..controllers.list_meals import ListMealController
 from ..app_types.http import HTTPResponse
+
 from ..repository.meal_repository import MealRepository
+from ..db.connection import get_db
 
 
 async def async_handler(event: Dict[str, Any], content: Dict[str, Any]) -> HTTPResponse:
@@ -16,7 +18,7 @@ async def async_handler(event: Dict[str, Any], content: Dict[str, Any]) -> HTTPR
 
     try:
         request = parse_protected_event(event=event)
-        controller = ListMealController(MealRepository())
+        controller = ListMealController(MealRepository(db_session=get_db))
         response = await controller.handle(request=request)
     except AccessTokenNotProvided:
         response = unauthorized(body={"error": "Access token not provided."})

@@ -9,14 +9,16 @@ from ..app_types.http import HTTPResponse
 from ..controllers.me import MeController
 from ..exceptions.AccessTokenNotProvided import AccessTokenNotProvided
 from ..exceptions.InvalidAccessToken import InvalidAccessToken
+
 from ..repository.user_repository import UserRepository
+from ..db.connection import get_db
 
 
 async def async_handler(event: Dict[str, Any], context: Any) -> HTTPResponse:
     response = None
     try:
         request = parse_protected_event(event=event)
-        controller = MeController(UserRepository())
+        controller = MeController(UserRepository(db_session=get_db))
         response = await controller.handle(data=request)
     except AccessTokenNotProvided:
         response = unauthorized(body={"error": "Access token not provided."})
