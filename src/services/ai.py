@@ -3,13 +3,13 @@ from datetime import datetime
 
 from openai import AsyncOpenAI
 
-client = AsyncOpenAI()
-
 class AIClient:
 
-    @classmethod
+    def __init__(self):
+        self.client = AsyncOpenAI()
+
     async def transcribe_audio(
-        cls,
+        self,
         audio_data: bytes,
         key: str
     ) -> str:
@@ -17,7 +17,7 @@ class AIClient:
             audio_file = io.BytesIO(audio_data)
             audio_file.name = key.split('/')[-1]
 
-            transcript = await client.audio.transcriptions.create(
+            transcript = await self.client.audio.transcriptions.create(
                 file=audio_file,
                 model="whisper-1"
             )
@@ -25,9 +25,8 @@ class AIClient:
         except Exception as e:
             raise RuntimeError(f"Audio transcription failed ({e})")
         
-    @classmethod
     async def get_meal_details_from_text(
-        cls,
+        self,
         input: str,
         created_at: datetime,
     ) -> str:
@@ -75,7 +74,7 @@ class AIClient:
             Meal: {input}
         """
         try:
-            response = await client.chat.completions.create(
+            response = await self.client.chat.completions.create(
                 model="gpt-4.1-mini",
                 messages=[
                     {
@@ -92,9 +91,8 @@ class AIClient:
         except Exception as e:
             raise RuntimeError(f"Failed to process meal details by text ({e})")
     
-    @classmethod
     async def get_meal_details_from_image(
-        cls,
+        self,
         image_url: str,
         created_at: datetime
     ) -> str:
@@ -141,7 +139,7 @@ class AIClient:
             }}
         """
         try:
-            response = await client.chat.completions.create(
+            response = await self.client.chat.completions.create(
                 model="gpt-4.1-mini",
                 messages=[
                     {
