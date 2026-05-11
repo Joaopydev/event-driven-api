@@ -49,7 +49,7 @@ async def test_signin_controller_ok(test_session_db, test_user):
         "password": "password",
     }
 
-    user_repository = UserRepository(db_session=lambda: test_session_db)
+    user_repository = UserRepository(test_session_db)
     hashed_service = HashedPasswordService()
 
     controller = SigninController(

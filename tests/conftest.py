@@ -4,8 +4,10 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, Asyn
 
 from src.db.models.base import Base
 from src.services.hashed_service import HashedPasswordService
-from src.repository.user_repository import UserRepository
 from src.controllers.signin import SigninController
+
+from src.repository.user_repository import UserRepository
+from src.repository.meal_repository import MealRepository
 
 
 @pytest.fixture
@@ -30,14 +32,13 @@ async def test_session_db(test_engine):
         class_=AsyncSession,
         expire_on_commit=False,
     )
-    async with async_session() as session:
-        yield session
+    yield async_session
 
 
 @pytest.fixture
 async def test_user(test_session_db):
     password_hash = HashedPasswordService.hash_password("password")
-    user_repository = UserRepository(db_session=lambda: test_session_db)
+    user_repository = UserRepository(test_session_db)
     user = await user_repository.insert_user(
         name="Teste",
         email="test@gmail.com",
@@ -48,7 +49,7 @@ async def test_user(test_session_db):
 @pytest.fixture
 async def test_login_user(test_session_db, test_user):
     controller = SigninController(
-        user_repository=UserRepository(db_session=lambda: test_session_db),
+        user_repository=UserRepository(test_session_db),
         hashed_service=HashedPasswordService()
     )
     response = await controller.handle(
@@ -59,3 +60,13 @@ async def test_login_user(test_session_db, test_user):
     )
 
     return response["body"]["access_token"]
+
+@pytest.fixture
+async def test_meal(test_session_db, test_user):
+    meal_repository = MealRepository(test_session_db)
+    meal = await meal_repository.create_meal(
+        user_id=test_user.id,
+        input_file_key="audio.mp4",
+        file_type="audio/m4a"
+    )
+    return meal

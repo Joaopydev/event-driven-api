@@ -14,7 +14,7 @@ async def test_signup_controller_invalid_data_entry(test_session_db):
     }
 
     controller = SignupController(
-        user_repository=UserRepository(db_session=lambda: test_session_db),
+        user_repository=UserRepository(test_session_db),
         hashed_service=HashedPasswordService()
     )
 
@@ -32,7 +32,7 @@ async def test_signup_controller_created(test_session_db):
     }
 
     controller = SignupController(
-        user_repository=UserRepository(db_session=lambda: test_session_db),
+        user_repository=UserRepository(db_session=test_session_db),
         hashed_service=HashedPasswordService()
     )
     response = await controller.handle(body=request_body)
@@ -50,7 +50,7 @@ async def test_signup_controller_conflict(test_session_db, test_user):
     }
 
     controller = SignupController(
-        user_repository=UserRepository(db_session=lambda: test_session_db),
+        user_repository=UserRepository(db_session=test_session_db),
         hashed_service=HashedPasswordService()
     )
     response = await controller.handle(body=request_body)
