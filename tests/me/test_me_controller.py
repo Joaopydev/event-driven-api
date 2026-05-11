@@ -47,7 +47,7 @@ async def test_me_controller(test_login_user, test_session_db):
 
     request = parse_protected_event(event=event)
 
-    controller = MeController(UserRepository(db_session=lambda: test_session_db))
+    controller = MeController(UserRepository(db_session=test_session_db))
     response = await controller.handle(data=request)
 
     assert response["statusCode"] == 200
