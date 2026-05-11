@@ -123,3 +123,46 @@ async def test_should_process_picture_meal_successfully():
         icon=MEAL_DETAILS_MOCK["icon"],
         foods=MEAL_DETAILS_MOCK["foods"],
     )
+
+@pytest.mark.asyncio
+async def test_should_failed_to_process_meal():
+    meal_mock = Mock(
+        id="meal-test-3",
+        status=MealStatus.uploading,
+        input_file_key="audio.mp4",
+        input_type=InputType.audio,
+        created_at=datetime.now(timezone.utc)
+    )
+
+    meal_repository_mock = Mock()
+    meal_repository_mock.get_meal_by_file_key = AsyncMock(return_value=meal_mock)
+    meal_repository_mock.update_meal_status = AsyncMock()
+    meal_repository_mock.update_meal_data = AsyncMock()
+
+    storage_service_mock = Mock()
+    storage_service_mock.read_object_content = AsyncMock(return_value=b"fake-audio")
+
+    ai_client_mock = Mock()
+    ai_client_mock.transcribe_audio = AsyncMock(side_effect=Exception("AI service error"))
+
+    process_meal = ProcessMeal(
+        meal_repository=meal_repository_mock,
+        storage_service=storage_service_mock,
+        ai_client=ai_client_mock,
+    )
+
+    await process_meal.process(file_key=meal_mock.input_file_key)
+
+    meal_repository_mock.update_meal_status.assert_any_await(
+        meal_id=meal_mock.id,
+        new_status=MealStatus.processing
+    )
+
+    storage_service_mock.read_object_content.assert_awaited_once_with(key=meal_mock.input_file_key)
+    ai_client_mock.transcribe_audio.assert_awaited_once()
+
+    meal_repository_mock.update_meal_data.assert_not_awaited()
+    meal_repository_mock.update_meal_status.assert_any_await(
+        meal_id=meal_mock.id,
+        new_status=MealStatus.failed
+    )
