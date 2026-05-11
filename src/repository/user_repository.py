@@ -1,6 +1,5 @@
 from sqlalchemy import select
 
-from ..db.connection import get_db
 from ..db.models.users import User
 
 
