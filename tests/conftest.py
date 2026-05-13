@@ -1,3 +1,4 @@
+from datetime import date
 import pytest
 
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
@@ -8,6 +9,7 @@ from src.controllers.signin import SigninController
 
 from src.repository.user_repository import UserRepository
 from src.repository.meal_repository import MealRepository
+from src.db.models.users import GoalType, GenderType
 
 
 @pytest.fixture
@@ -43,6 +45,16 @@ async def test_user(test_session_db):
         name="Teste",
         email="test@gmail.com",
         password=password_hash,
+        goal=GoalType.gain,
+        gender=GenderType.male,
+        birth_date=date(2001, 3, 15),
+        height=165,
+        weight=90,
+        activity_level=3,
+        calories=0,
+        proteins=0,
+        carbohydrates=0,
+        fats=0
     )
     return user
 
