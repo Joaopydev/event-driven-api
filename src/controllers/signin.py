@@ -1,6 +1,5 @@
 from typing import Dict
 from pydantic import BaseModel, ValidationError, EmailStr
-import bcrypt
 
 from ..lib.jwt import signin_access_token
 from ..app_types.http import HTTPResponse
@@ -27,17 +26,16 @@ class SigninController:
     
     async def handle(self, body: Dict[str, str]) -> HTTPResponse:
         try:
-            data = self._validate_body(body=body)
+            event = self._validate_body(body=body)
         except ValidationError as ex:
             return bad_request(body={"errors": ex.errors()})
         
-        body = data.model_dump()
-        user = await self.user_repository.get_user_by_email(email=body["email"])
+        user = await self.user_repository.get_user_by_email(email=event.email)
         if not user:
             return unauthorized(body={"error": "Invalid Credentials."})
         
         is_valid_password = self.hashed_service.verify_password(
-            password=body.get("password"),
+            password=event.password,
             hashed_password=user.password
         )
         if not is_valid_password:
