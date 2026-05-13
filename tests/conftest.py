@@ -71,7 +71,7 @@ async def test_login_user(test_session_db, test_user):
         }
     )
 
-    return response["body"]["access_token"]
+    return response["body"]["accessToken"]
 
 @pytest.fixture
 async def test_meal(test_session_db, test_user):

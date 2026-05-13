@@ -59,4 +59,4 @@ async def test_signin_controller_ok(test_session_db, test_user):
     result = await controller.handle(body=request_body)
 
     assert result["statusCode"] == 200
-    assert "access_token" in result["body"]
+    assert "accessToken" in result["body"]

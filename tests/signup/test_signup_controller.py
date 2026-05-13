@@ -54,7 +54,7 @@ async def test_signup_controller_created(test_session_db):
     response = await controller.handle(body=request_body)
 
     assert response.get("statusCode", 400) == 201
-    assert "access_token" in response.get("body", {})
+    assert "accessToken" in response.get("body", {})
 
 
 @pytest.mark.asyncio
