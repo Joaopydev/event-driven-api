@@ -42,4 +42,4 @@ class SigninController:
             return unauthorized(body={"error": "Invalid Credentials."})
         
         access_token = signin_access_token(user_id=user.id)
-        return ok(body={"access_token": access_token})
+        return ok(body={"accessToken": access_token})

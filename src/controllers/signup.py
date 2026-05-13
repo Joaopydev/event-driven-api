@@ -10,6 +10,7 @@ from ..repository.user_repository import UserRepository
 from ..services.hashed_service import HashedPasswordService
 
 from ..db.models.users import GenderType, GoalType
+from ..lib.goal_calculator import calculate_goals, CalculateGoalsParams
 
 
 class AccountSchema(BaseModel):
@@ -48,6 +49,15 @@ class SignupController:
             return conflict(body={"error": "Email already exists"})
             
         hashed_password = self.hashed_service.hash_password(password=event.account.password)
+        calculate_goals_params = CalculateGoalsParams(
+            height=event.height,
+            weight=event.weight,
+            gender=event.gender.value,
+            birth_date=event.birthDate,
+            activity_level=event.activityLevel,
+            goal=event.goal.value
+        )
+        goals = calculate_goals(calculate_goals_params)
         new_user = await self.user_repository.insert_user(
             name=event.account.name,
             email=event.account.email,
@@ -58,10 +68,10 @@ class SignupController:
             height=event.height,
             weight=event.weight,
             activity_level=event.activityLevel,
-            calories=0,
-            proteins=0,
-            carbohydrates=0,
-            fats=0
+            calories=goals["calories"],
+            proteins=goals["proteins"],
+            carbohydrates=goals["carbohydrates"],
+            fats=goals["fats"],
         )
         access_token = signin_access_token(user_id=new_user.id)
-        return created(body={"access_token": access_token})
+        return created(body={"accessToken": access_token})
