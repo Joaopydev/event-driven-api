@@ -15,7 +15,7 @@ class FileType(StrEnum):
 
 
 class CreateMealSchema(BaseModel):
-    file_type: FileType
+    fileType: FileType
     
 
 class CreateMealController:
@@ -54,4 +54,4 @@ class CreateMealController:
             file_type=data.file_type.value,
         )
 
-        return created(body={"meal": meal.id, "presigned_url": presigned_url})
+        return created(body={"meal": meal.id, "presignedUrl": presigned_url})

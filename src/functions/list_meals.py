@@ -15,7 +15,6 @@ from ..db.connection import get_db
 
 async def async_handler(event: Dict[str, Any], content: Dict[str, Any]) -> HTTPResponse:
     response = None
-
     try:
         request = parse_protected_event(event=event)
         controller = ListMealController(MealRepository(db_session=get_db))

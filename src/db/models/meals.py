@@ -55,9 +55,6 @@ class Meal(Base):
     def to_dict(self) -> Dict[str, Any]:
         return {
             "id": self.id,
-            "status": self.status.value,
-            "input_file_key": self.input_file_key,
-            "input_type": self.input_type.value,
             "name": self.name,
             "icon": self.icon,
             "foods": self.foods,
