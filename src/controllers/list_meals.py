@@ -1,4 +1,4 @@
-from datetime import date, time, datetime
+from datetime import date, time, datetime, timezone
 from zoneinfo import ZoneInfo
 from typing import Dict, Any
 from pydantic import BaseModel, ValidationError
@@ -39,7 +39,7 @@ class ListMealController:
         )
         meals = await self.meal_repository.list_meals_by_date(
             user_id=request["user_id"],
-            start_date=start_date,
-            end_date=end_date,
+            start_date=start_date.astimezone(timezone.utc),
+            end_date=end_date.astimezone(timezone.utc),
         )
         return ok(body={"meals": [meal.to_dict for meal in meals]})
