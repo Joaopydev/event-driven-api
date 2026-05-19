@@ -11,6 +11,7 @@ provider:
     SECRET_JWT_PRIVATE_KEY: ${env:SECRET_JWT_PRIVATE_KEY}
     SECRET_JWT_PUBLIC_KEY: ${env:SECRET_JWT_PUBLIC_KEY}
     OPENAI_API_KEY: ${env:OPENAI_API_KEY}
+    ISSUER: ${env:ISSUER}
     BUCKET_NAME: !Ref UploadsBucket
     MEALS_QUEUE_URL: !Ref MealsQueue
   iam:
