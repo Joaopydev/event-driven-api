@@ -1,4 +1,5 @@
 import asyncio
+import logging
 from typing import Dict, Any
 
 from ..utils.parse_protected_event import parse_protected_event
@@ -32,6 +33,7 @@ async def async_handler(event: Dict[str, Any], context: Any) -> HTTPResponse:
     except Exception as e:
         response = unauthorized(body={"error": str(e)})
     finally:
+        logging.info(f"Lambda returns: {response}")
         return parse_response(response=response)
     
 
