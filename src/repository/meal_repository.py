@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import datetime
 from typing import List, Dict
 from sqlalchemy import select, update
 
@@ -50,7 +50,8 @@ class MealRepository:
             result = await db.execute(query)
             return result.scalars().first()
         
-    async def list_meals_by_date(self, user_id: int, start_date: date, end_date: datetime) -> List[Meal]:
+    async def list_meals_by_date(self, user_id: int, start_date: datetime, end_date: datetime) -> List[Meal]:
+
         async with self.db_session() as db:
             query = select(Meal).where(
                 Meal.user_id == user_id,

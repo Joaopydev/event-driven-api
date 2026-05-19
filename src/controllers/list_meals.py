@@ -1,4 +1,5 @@
 from datetime import date, time, datetime
+from zoneinfo import ZoneInfo
 from typing import Dict, Any
 from pydantic import BaseModel, ValidationError
 
@@ -8,6 +9,7 @@ from ..repository.meal_repository import MealRepository
 
 class QueryEventSchema(BaseModel):
     date: date
+    timeZone: str
 
 class ListMealController:
 
@@ -19,14 +21,24 @@ class ListMealController:
     
     async def handle(self, request: ProtectedHttpRequest) -> HTTPResponse:
         try:
-            data = self._validate_query_params(query_params=request.get("query_params"))
+            query_event = self._validate_query_params(query_params=request.get("query_params"))
         except ValidationError as ex:
             return bad_request(body={"errors": ex.errors()})
         
-        end_date = datetime.combine(data.date, time(23, 59, 59, 59))
+        user_timezone = ZoneInfo(query_event.timeZone)
+        start_date = datetime.combine(
+            query_event.date,
+            time.min,
+            user_timezone
+        )
+        end_date = datetime.combine(
+            query_event.date,
+            time.max,
+            user_timezone,
+        )
         meals = await self.meal_repository.list_meals_by_date(
             user_id=request["user_id"],
-            start_date=data.date,
-            end_date=end_date
+            start_date=start_date,
+            end_date=end_date,
         )
         return ok(body={"meals": [meal.to_dict for meal in meals]})
